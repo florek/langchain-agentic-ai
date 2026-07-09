@@ -10,18 +10,22 @@ LangChain to framework open-source do budowania aplikacji opartych o modele jęz
 
 LangChain rozróżnia:
 
-- **LLM** — modele tekstowe przyjmujące i zwracające surowy string.
-- **Chat Models** — modele konwersacyjne operujące na listach wiadomości (`SystemMessage`, `HumanMessage`, `AIMessage`).
+- **LLM** — historycznie modele przyjmujące i zwracające pojedynczy string tekstu.
+- **Chat Models** — nowoczesne modele konwersacyjne; **główny interfejs** do pracy z LLM w LangChain. Operują na listach wiadomości (`SystemMessage`, `HumanMessage`, `AIMessage`): wejściem jest lista ustrukturyzowanych wiadomości (instrukcja systemowa, pytania użytkownika, odpowiedzi AI), a wyjściem wiadomość AI z odpowiedzią modelu.
 
-W praktyce nowoczesne API (OpenAI, Ollama) używa się głównie przez Chat Models.
+Chat Model to ujednolicony sposób rozmowy z różnymi dostawcami — OpenAI (GPT), Anthropic, Google Gemini, a także modele open-source (np. Llama przez Ollama) — przez ten sam interfejs. Klasa integrująca z OpenAI API (np. `ChatOpenAI`) jest wrapperem nad API dostawcy, zgodnym z abstrakcją Chat Model.
+
+W praktyce nowoczesne API używa się głównie przez Chat Models; klasyczne LLM (string → string) pozostają dla starszych lub prostszych integracji.
 
 ### Prompty (Prompt Templates)
 
-Szablony promptów pozwalają parametryzować instrukcje — zamiast konkatenacji stringów definiuje się szablon z placeholderami (np. `{question}`, `{context}`), który jest wypełniany danymi w runtime.
+Prompt Template to pierwsza abstrakcja LangChain przy programistycznym dostępie do modelu — opakowanie (wrapper) wokół promptu, które przyjmuje parametry wejściowe. Zamiast ręcznej konkatenacji stringów definiuje się szablon z placeholderami (np. `{product}`, `{question}`), który wypełnia się danymi w runtime i wielokrotnie uruchamia z różnymi wartościami. Ten sam szablon z `product=cat food` da inny wynik niż z `product=piano`, bo wejście jest inne. Główna rola: formatowanie danych do stringów wysyłanych do LLM.
 
 ### Łańcuchy (Chains)
 
-Łańcuch to sekwencja kroków: prompt → model → parser wyjścia. W LangChain 1.x koncepcja łańcuchów ewoluowała w kierunku **LangChain Expression Language (LCEL)** — deklaratywnego składania komponentów operatorem `|`.
+Łańcuch to workflow łączący wiele komponentów LangChain w sekwencji, gdzie **wynik jednego kroku staje się wejściem następnego**. Każdy krok może być wywołaniem LLM, promptem, transformacją danych, wywołaniem narzędzia lub innym łańcuchem. Łańcuch wykracza poza pojedyncze zapytanie–odpowiedź — np. sformatowanie zapytania użytkownika → wysłanie do LLM → sparsowanie wyjścia do struktury → wywołanie zewnętrznego API → przekazanie odpowiedzi API do kolejnego promptu LLM. Ta kompozycja kroków pozwala budować złożone aplikacje na modelach językowych.
+
+W LangChain 1.x koncepcja łańcuchów ewoluowała w kierunku **LangChain Expression Language (LCEL)** — deklaratywnego składania komponentów operatorem `|`.
 
 Przykład idei LCEL:
 
@@ -123,3 +127,4 @@ LangGraph jest naturalnym narzędziem do implementacji takich architektur dzięk
 - Loguj i śledź wywołania (LangSmith) od początku projektu, nie dopiero w produkcji.
 - Testuj prompty na reprezentatywnych przykładach przed wdrożeniem.
 - Separuj konfigurację (klucze API, nazwy modeli) od logiki aplikacji.
+- Przeglądaj kod źródłowy frameworka (np. implementację klas Chat Model czy Prompt Template) — to skuteczny sposób zrozumienia działania abstrakcji „za kulisami”, bez konieczności znać całej implementacji na pamięć.

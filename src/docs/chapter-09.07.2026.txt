@@ -1,0 +1,135 @@
+However, when we're dealing with programmatic access to the LLM, then we might want to take a prompt
+
+and to give it parameters.
+
+So one time I want to run this prompt where the product is cat food.
+
+The other time where the product is purchase.
+
+And for the last time, let's say I want to run it where the product is a piano.
+
+Okay.
+
+So for each different prompt I will get different output because the input was different.
+
+So this is the first abstraction that blockchain is introducing us.
+
+It's a prompt template and it's simply a wrapper class around a prompt.
+
+So it adds functionality to prompt to receive an input.
+
+For example, we can run this prompt now many times with different inputs.
+
+And the gist of it is that it simply helps us format things into strings, which are eventually being
+
+sent to llms.
+
+It also provides a lot more functionality than that which we are going to explore and check out in the
+
+course.
+
+Cool.
+
+So let's now import the chat OpenAI class, which is a chat model and a wrapper over the OpenAI API.
+
+The chat model object is often going to be our primary interface for interacting with large language
+
+models.
+
+And it is a standard way that LinkedIn help us to talk to those llms like GPT four.
+
+Anthropic lad, Google, Gemini, and even open source models like Llama by Facebook via O llama.
+
+So historically, many Llms just took a single string of text as an input and returned as a single string
+
+of text.
+
+However, modern llms are designed for conversation and interaction between a user, so they work best
+
+when we provide them with a list of messages representing the dialogue and the history, and they return
+
+us a message back.
+
+And this is the core of the chat model interface.
+
+The input is going to be a list of structured messages like a system instruction, user questions or
+
+AI responses.
+
+And the output is going to be an AI message representing the response of the large language model.
+
+However, chat model objects are very powerful and beyond generating human like text, they have very
+
+cool capabilities which a lot of them will be using in the course.
+
+And if you're curious about those capabilities, you can check out this video in the glossary section.
+
+But don't worry about it too much because we will be covering this hands on in the course.
+
+All right, let's go back to the code.
+
+And one of the best habits you can develop as a developer is to look inside the actual source code of
+
+the frameworks you're working with, and in this case Linkchain.
+
+And exploring the implementations directly is a great way to really understand what's going on behind
+
+the scenes.
+
+And we're going to be doing a lot of this in the course.
+
+So let me just show you how to do it.
+
+So I'm simply going to click command and on the class name.
+
+And then we can see the implementation of the class.
+
+Let's do the same for chat OpenAI.
+
+And here we can check out all the documentation, which is hardcoded in the source code itself and the
+
+functionality itself.
+
+But we're not going to cover this right now.
+
+This is a very high level overview.
+
+And of course, I'm not expecting you to know the inside implementation of all of those classes and
+
+objects.
+
+We're here to write our first link chain chain.
+
+And a link chain chain is a workflow that connects multiple components in linked chain together.
+
+In a sequence where the output of one step becomes the input of the next step.
+
+And just to give you a bit more detail here, each step can be an LM call, a prompt, a plate data
+
+transformation or tool call, and we'll get to tool calls.
+
+Don't worry about it.
+
+And it can even be another chain.
+
+And a chain Let us go beyond just making a single LLM prompt in response.
+
+So, for example, instead of asking a model one big question, we might want to format the user query
+
+into a structured prompt.
+
+We want to send this prompt to the LLM.
+
+Then we want to parse the llms output into some structured data, and then use this data to call to
+
+an external API and feed the API response into another LLM prompt.
+
+And with this composition idea, we can build some very advanced tech here.
+
+And this is why LinkedIn became so popular and so widely adopted and used, because it was the first
+
+framework that really allowed us to do those really complex things and to build on top of those llms
+
+some very cool stuff like agents, and we'll be diving very deep into agents, so don't worry about
+
+it.
