@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LangChain Agentic AI Quiz — 24.09.2026</title>
+<style>
+:root {
+  --bg: #f0f4f8;
+  --bg-accent: #e2eef6;
+  --surface: #ffffff;
+  --surface-2: #eef3f7;
+  --border: #c5d0db;
+  --text: #1a2332;
+  --muted: #5a6a7a;
+  --accent: #0d6e6e;
+  --accent-soft: #d4ecec;
+  --accent-hover: #0a5555;
+  --ok: #1a7f4b;
+  --ok-bg: #e6f5ec;
+  --bad: #b42318;
+  --bad-bg: #fcebea;
+  --learn: #1d5f8a;
+  --learn-bg: #e8f2f8;
+  --easy: #1d6fa5;
+  --mid: #b45309;
+  --hard: #9f1239;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(26, 35, 50, 0.04), 0 8px 24px rgba(26, 35, 50, 0.06);
+  --font-display: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 65% 40% at 0% 0%, #d4e8e8 0%, transparent 55%),
+    radial-gradient(ellipse 50% 35% at 100% 0%, #d6e4f0 0%, transparent 50%),
+    var(--bg);
+  line-height: 1.55;
+}
+.wrap { max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+header {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+header .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+.sub { color: var(--muted); margin: 0; font-size: 0.95rem; }
+.progress {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1.5rem;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.progress strong { color: var(--accent); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.card.ok {
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--border));
+  background: linear-gradient(180deg, var(--ok-bg), var(--surface) 40%);
+}
+.card.bad {
+  border-color: color-mix(in srgb, var(--bad) 40%, var(--border));
+  background: linear-gradient(180deg, var(--bad-bg), var(--surface) 40%);
+}
+.card.learn {
+  border-color: color-mix(in srgb, var(--learn) 40%, var(--border));
+  background: linear-gradient(180deg, var(--learn-bg), var(--surface) 40%);
+}
+.meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.65rem; }
+.tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.tag.diff-łatwe { color: var(--easy); background: #e8f3fa; border-color: #c5dde9; }
+.tag.diff-średnie { color: var(--mid); background: #faf0e4; border-color: #ead5b8; }
+.tag.diff-trudne { color: var(--hard); background: #fce8ef; border-color: #e9c0cd; }
+.q-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin: 0 0 0.9rem;
+  font-weight: 600;
+}
+.q-title .num { color: var(--accent); margin-right: 0.35rem; }
+.prompt { margin: 0 0 1rem; white-space: pre-wrap; }
+.options { display: grid; gap: 0.45rem; }
+label.opt {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f7fafc;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+label.opt:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--accent-soft);
+}
+label.opt:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+label.opt.opt-idk {
+  background: #f3f6f9;
+  border-style: dashed;
+}
+label.opt input { margin-top: 0.25rem; accent-color: var(--accent); }
+.letter { font-weight: 700; color: var(--accent); min-width: 1.1rem; }
+.confidence {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.confidence select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.55rem;
+}
+.feedback {
+  margin-top: 0.85rem;
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 0.92rem;
+}
+.feedback.ok-box { background: var(--ok-bg); border-color: #b7dfc5; }
+.feedback.bad-box { background: #fff7f6; border-color: #f0c4bf; }
+.feedback.learn-box { background: var(--learn-bg); border-color: #b9d4e6; }
+.feedback h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem;
+}
+.feedback h4 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.feedback p { margin: 0 0 0.45rem; }
+.feedback .remember {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px dashed var(--border);
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  position: sticky;
+  bottom: 1rem;
+}
+button, .btn {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem 1.25rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(13, 110, 110, 0.25);
+}
+button.primary:hover { background: var(--accent-hover); }
+button.ghost, .btn.ghost {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+button.ghost:hover, .btn.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+#results { display: none; margin-bottom: 1.5rem; }
+#results.show { display: block; }
+#results .score-line {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  margin: 0 0 0.35rem;
+}
+#results .score-line span { color: var(--accent); }
+.hint { color: var(--muted); font-size: 0.85rem; margin: 0.5rem 0 0; }
+code {
+  font-size: 0.9em;
+  background: var(--surface-2);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">LangChain Agentic AI</p>
+      <h1>Quiz — 24.09.2026</h1>
+      <p class="sub">20 pytań (10 ostatnia lekcja + 10 powtórka) · A–D albo „Nie mam pojęcia” · opcjonalnie pewność 1–5</p>
+    </header>
+
+    <div class="progress" id="progress">
+      <span>Udzielone: <strong id="answered-count">0</strong> / 20</span>
+      <span id="status-label">W trakcie</span>
+    </div>
+
+    <section id="results">
+      <div class="card">
+        <p class="score-line">Wynik: <span id="score-text">0/20</span></p>
+        <p class="sub" id="pct-text"></p>
+        <p class="sub" id="idk-text"></p>
+        <p class="hint">Pobierz pliki i zapisz je w <code>docs/quiz/my_answers/</code> oraz <code>docs/quiz/results/</code>.</p>
+        <div class="actions" style="position:static;margin-top:1rem">
+          <button type="button" class="ghost" id="dl-answers">Pobierz 24.09.2026_my_answers.md</button>
+          <button type="button" class="ghost" id="dl-results">Pobierz 24.09.2026_results.md</button>
+        </div>
+      </div>
+    </section>
+
+    <form id="quiz-form"></form>
+
+    <div class="actions">
+      <button type="button" class="primary" id="submit-btn">Sprawdź wynik</button>
+      <button type="button" class="ghost" id="reset-btn">Wyczyść</button>
+    </div>
+  </div>
+
+<script>
+const QUIZ = {"date": "24.09.2026", "questions": [{"n": 1, "difficulty": "łatwe", "category": "LangChain", "prompt": "Co robi operator `|` w LCEL, gdy łączysz szablon promptu z modelem chat?", "options": {"A": "Trenuje model od zera na Twoim dysku", "B": "Zapisuje klucz API do pliku `.gitignore`", "C": "Składa komponenty w łańcuch Runnable: najpierw szablon, potem model", "D": "Wymusza użycie wyłącznie bazy wektorowej Pinecone"}}, {"n": 2, "difficulty": "łatwe", "category": "LLM", "prompt": "Czym jest **tool calling** w systemach agentowych?", "options": {"A": "Mechanizm, w którym model zwraca strukturalne żądanie wywołania funkcji zamiast samego tekstu", "B": "Wyłącznie formatowanie CSS strony quizu", "C": "Trenowanie embeddingów bez dokumentów", "D": "Zamiana LangGraph na zwykły f-string"}}, {"n": 3, "difficulty": "średnie", "category": "LLM", "prompt": "Parametr `temperature` w modelu chat steruje przede wszystkim:", "options": {"A": "liczbą plików w `.venv`", "B": "losowością / kreatywnością odpowiedzi modelu", "C": "rozmiarem chunków w RAG", "D": "wyborem menedżera pakietów uv zamiast pip"}}, {"n": 4, "difficulty": "średnie", "category": "LLM", "prompt": "**MCP** (Model Context Protocol) to:", "options": {"A": "baza wektorowa konkurencyjna wobec FAISS", "B": "język programowania zamiast Pythona", "C": "wyłącznie narzędzie do formatowania kodu Black", "D": "otwarty standard łączenia LLM z zewnętrznymi źródłami kontekstu i narzędziami"}}, {"n": 5, "difficulty": "łatwe", "category": "LangChain", "prompt": "Skąd `PromptTemplate` bierze wartości do placeholderów (np. `{information}`) przy wywołaniu łańcucha?", "options": {"A": "Ze słownika przekazanego do `invoke`, z kluczami zgodnymi z `input_variables`", "B": "Wyłącznie z nazwy pliku `uv.lock`", "C": "Z losowych tokenów bez walidacji", "D": "Z grafu stanów LangGraph — bez żadnego słownika"}}, {"n": 6, "difficulty": "trudne", "category": "LLM", "prompt": "Efekt **lost in the middle** w context engineeringu oznacza, że:", "options": {"A": "model zawsze czyta tylko ostatni znak promptu", "B": "RAG nigdy nie działa przy więcej niż jednym dokumencie", "C": "modele gorzej wykorzystują informacje umieszczone w środku bardzo długiego kontekstu", "D": "`temperature=0` usuwa całe okno kontekstowe"}}, {"n": 7, "difficulty": "średnie", "category": "LangChain", "prompt": "Typowa pułapka przy odczycie odpowiedzi z łańcucha chat: drukowanie całego obiektu odpowiedzi zamiast `.content` powoduje, że:", "options": {"A": "model automatycznie włącza tool calling", "B": "widać metadane obiektu odpowiedzi, a nie sam wygenerowany tekst dla użytkownika", "C": "`PromptTemplate` przestaje być Runnable", "D": "Ollama zawsze startuje na porcie 80"}}, {"n": 8, "difficulty": "łatwe", "category": "LLM", "prompt": "**FAISS** w ekosystemie RAG to przede wszystkim:", "options": {"A": "biblioteka do szybkiego wyszukiwania podobieństwa (lokalnie w pamięci lub na dysku)", "B": "platforma tracingu jak LangSmith", "C": "protokół MCP do hostowania agentów w chmurze", "D": "menedżer pakietów Python zamiast uv"}}, {"n": 9, "difficulty": "trudne", "category": "LLM", "prompt": "Wysoka `temperature` przy zadaniu wymagającym stałej struktury odpowiedzi (np. „krótkie podsumowanie + dwa fakty”) najczęściej:", "options": {"A": "gwarantuje identyczny JSON przy każdym wywołaniu", "B": "wyłącza potrzebę `PromptTemplate`", "C": "wymusza użycie wyłącznie `ChatOllama`", "D": "utrudnia uzyskanie stabilnego, powtarzalnego formatu odpowiedzi"}}, {"n": 10, "difficulty": "średnie", "category": "LLM", "prompt": "`ConversationBufferMemory` vs `ConversationSummaryMemory` — różnica:", "options": {"A": "obie zawsze usuwają historię po pierwszej turze", "B": "Buffer trzyma pełną historię; Summary kompresuje historię do podsumowania", "C": "Summary działa tylko z Pinecone; Buffer tylko z FAISS", "D": "Buffer wymaga LangGraph; Summary go zabania"}}, {"n": 11, "difficulty": "łatwe", "category": "LangChain", "prompt": "Integracja `ChatOpenAI` pochodzi z pakietu:", "options": {"A": "`langchain-ollama`", "B": "`python-dotenv` wyłącznie", "C": "`langchain-openai`", "D": "`black` / `isort`"}}, {"n": 12, "difficulty": "trudne", "category": "LLM", "prompt": "Dlaczego natywne tool calling jest preferowane względem klasycznego tekstowego formatu ReAct, gdy model je obsługuje?", "options": {"A": "Mniej halucynacji formatu i większa niezawodność strukturalnych wywołań narzędzi", "B": "Bo całkowicie usuwa potrzebę jakiegokolwiek rozumowania agenta", "C": "Bo zastępuje wszystkie bazy wektorowe jednym plikiem CSV", "D": "Bo wyłącza limity tokenów kontekstu"}}, {"n": 13, "difficulty": "średnie", "category": "LangChain", "prompt": "Poprawna kolejność minimalnego przepływu end-to-end (prompt → model) to:", "options": {"A": "`invoke` → dopiero potem `load_dotenv` → na końcu szablon", "B": "wyłącznie trenowanie modelu ML bez promptu", "C": "najpierw LangSmith Evaluation, potem usunięcie `.env`", "D": "`load_dotenv` → `PromptTemplate` → LLM → złożenie `prompt | llm` → `invoke` → odczyt `.content`"}}, {"n": 14, "difficulty": "średnie", "category": "LLM", "prompt": "W pipeline RAG kluczowa decyzja projektowa — rozmiar chunków i strategia podziału — wpływa na jakość odpowiedzi:", "options": {"A": "wyłącznie na kolor wykresów w LangSmith", "B": "często bardziej niż sam wybór modelu LLM", "C": "tylko wtedy, gdy nie ma embeddingów", "D": "wcale — chunking jest opcjonalną dekoracją bez skutków"}}, {"n": 15, "difficulty": "trudne", "category": "LangChain", "prompt": "Jeśli klucze w słowniku przekazanym do `chain.invoke(...)` nie zgadzają się z `input_variables` szablonu:", "options": {"A": "łańcuch cicho pomija placeholdery i działa dalej bez błędu", "B": "model lokalny Ollama nadpisuje wszystkie klucze", "C": "zwykle pojawia się błąd walidacji wejścia", "D": "operator `|` automatycznie tworzy nowy PromptTemplate"}}, {"n": 16, "difficulty": "łatwe", "category": "Narzędzia", "prompt": "Polecenie `uv sync` w typowym przepływie projektu:", "options": {"A": "tworzy środowisko wirtualne i instaluje zależności z lockfile", "B": "commituje plik `.env` z kluczami API do Gita", "C": "uruchamia wyłącznie model GPT bez Pythona", "D": "usuwa `pyproject.toml` i zastępuje go YAML"}}, {"n": 17, "difficulty": "trudne", "category": "LLM", "prompt": "**Deep Agents** w sensie kursu to przede wszystkim:", "options": {"A": "pojedyncze wywołanie LLM bez pętli i narzędzi", "B": "zaawansowane architektury z wielopoziomowym planowaniem i delegowaniem podzadań", "C": "synonim samej bazy Chroma bez agentów", "D": "wyłącznie styl formatowania Black"}}, {"n": 18, "difficulty": "średnie", "category": "LLM", "prompt": "Po co ustawiać `temperature=0` przy zadaniach typu streszczenie i fakty?", "options": {"A": "Aby wyłączyć całkowicie generowanie tekstu", "B": "Aby wymusić użycie tylko FAISS", "C": "Aby zastąpić `invoke` metodą `fit`", "D": "Aby dążyć do bardziej deterministycznych, powtarzalnych wyników"}}, {"n": 19, "difficulty": "średnie", "category": "LLM", "prompt": "**Pruning tool results** w context engineeringu oznacza:", "options": {"A": "dodawanie wszystkich wyników narzędzi bez limitu długości", "B": "trenowanie modelu na wynikach narzędzi", "C": "obcinanie zbyt długich wyników narzędzi przed dołączeniem ich do kontekstu", "D": "usuwanie instrukcji systemowej na rzecz historii czatu"}}, {"n": 20, "difficulty": "trudne", "category": "LangChain", "prompt": "Dlaczego `PromptTemplate` jest lepszy od ręcznego f-stringa sklejanego tuż przed API, gdy budujesz aplikację w LangChain?", "options": {"A": "Szablon jest elementem Runnable: da się go złożyć w łańcuch i wielokrotnie wywoływać z różnymi danymi", "B": "f-stringi są zabronione w Pythonie 3.12", "C": "`PromptTemplate` automatycznie buduje indeks FAISS", "D": "Bez szablonu `ChatOpenAI` nie przyjmuje parametru `model`"}}], "answers": {"1": {"correct": "C", "why": "Operator `|` w LCEL składa komponenty w łańcuch Runnable (najpierw szablon, potem model).", "lesson": {"correct": "Wyobraź sobie klocki. Jeden klocek to szablon promptu. Drugi to model chat. Operator `|` (pipe) łączy je w jeden łańcuch zwany Runnable. Najpierw szablon wypełnia placeholdery. Potem wynik idzie do modelu. Nie trenujesz tu modelu od zera — tylko składasz gotowe elementy w kolejkę kroków.", "example": "Masz szablon: „Podsumuj {information}”. Model: ChatOpenAI. Piszesz: chain = prompt | llm. Potem chain.invoke({\"information\": \"tekst o osobie\"}). Najpierw powstaje pełny prompt, potem model odpowiada. Jak taśma produkcyjna: najpierw opakowanie, potem pieczątka.", "remember": "Pipe `|` = sklej szablon z modelem w jeden Runnable.", "wrong": {"A": "Operator `|` nie trenuje modelu. Trening to zupełnie inna rzecz. Tu tylko składasz gotowe komponenty aplikacji LLM.", "B": "`.gitignore` chroni sekrety w Gicie. Operator LCEL nie zapisuje kluczy API — to nie jego rola.", "D": "Pinecone to baza wektorowa w RAG. LCEL `|` łączy Runnable, nie wymusza żadnej bazy wektorowej."}}}, "2": {"correct": "A", "why": "Tool calling: model zwraca strukturalne żądanie wywołania funkcji zamiast samego tekstu.", "lesson": {"correct": "Tool calling to sposób, w którym model nie pisze tylko zwykłego zdania. Zamiast tego prosi o uruchomienie funkcji: podaje nazwę i argumenty. Runtime wykonuje funkcję (np. pogodę) i oddaje wynik modelowi. Potem model pisze już normalną odpowiedź dla człowieka. To podstawa agentów z narzędziami.", "example": "Pytasz: „Jaka jest pogoda w Warszawie?”. Model nie zgaduje. Zwraca coś w stylu: wywołaj get_weather(city=\"Warsaw\"). Program wywołuje API pogody. Dostaje „18°C, deszcz”. Model mówi: „W Warszawie jest 18 stopni i pada.”", "remember": "Tool calling = model prosi o funkcję, nie tylko gada.", "wrong": {"B": "CSS strony nie ma związku z tool calling. To mechanizm LLM i narzędzi, nie wyglądu quizu.", "C": "Trenowanie embeddingów dotyczy RAG i wektorów. Tool calling to wywoływanie funkcji przez model.", "D": "LangGraph to grafy przepływu. Tool calling nie zamienia go na f-string."}}}, "3": {"correct": "B", "why": "`temperature` steruje losowością / kreatywnością odpowiedzi modelu.", "lesson": {"correct": "Temperature mówi modelowi: „bądź przewidywalny albo bardziej kreatywny”. Niska wartość (ok. 0) daje spokojniejsze, bardziej powtarzalne odpowiedzi. Wyższa wartość dodaje losowości. To nie liczba plików w środowisku i nie rozmiar chunków RAG. To pokrętło stylu generowania tekstu.", "example": "Przy temperature=0 dwa razy prosisz o streszczenie tej samej biografii — odpowiedzi są bardzo podobne. Przy wysokiej temperature model może za drugim razem dodać inne fakty albo zmienić kolejność. Dlatego do „summary + facts” często bierze się 0.", "remember": "Temperature = pokrętło losowości odpowiedzi.", "wrong": {"A": "Liczba plików w `.venv` nie zależy od temperature. To parametr modelu, nie menedżera pakietów.", "C": "Rozmiar chunków to decyzja w RAG. Temperature dotyczy generowania tekstu przez model.", "D": "uv vs pip to wybór narzędzi developerskich. Temperature tego nie wybiera."}}}, "4": {"correct": "D", "why": "MCP to otwarty standard łączenia LLM z zewnętrznymi źródłami kontekstu i narzędziami.", "lesson": {"correct": "MCP to „wspólny język” między modelem a światem zewnętrznym. Zamiast pisać osobną integrację do każdego API, serwer MCP udostępnia zasoby i narzędzia w standardowym formacie. Klient (np. agent) może je odkrywać i używać. To nie baza wektorowa i nie język programowania.", "example": "Wyobraź sobie wtyczki do odkurzacza: jeden standard końcówki pasuje do wielu rurek. MCP jest takim standardem końcówki dla narzędzi i kontekstu — model podłącza się tak samo do różnych źródeł.", "remember": "MCP = wspólny wtyk do narzędzi i kontekstu dla LLM.", "wrong": {"A": "FAISS/Chroma/Pinecone to bazy wektorowe. MCP to protokół łączenia, nie magazyn wektorów.", "B": "Nadal programujesz w Pythonie. MCP nie zastępuje języka.", "C": "Black formatuje kod. MCP dotyczy narzędzi i kontekstu dla modeli."}}}, "5": {"correct": "A", "why": "Wartości placeholderów pochodzą ze słownika `invoke` zgodnego z `input_variables`.", "lesson": {"correct": "Szablon ma dziury, np. {information}. Lista input_variables mówi, jak nazywają się te dziury. Przy invoke podajesz słownik: nazwa dziury → wartość. Łańcuch wypełnia szablon i dopiero wtedy woła model. Bez pasujących kluczy walidacja zwykle krzyczy błędem.", "example": "Szablon: „Zrób summary z {information}”. input_variables = [\"information\"]. Wywołujesz: invoke({\"information\": \"długi tekst o osobie\"}). Model dostaje już pełne zdanie z wklejonym tekstem, nie goły placeholder.", "remember": "Placeholdery = klucze ze słownika invoke.", "wrong": {"B": "`uv.lock` trzyma wersje pakietów. Nie wypełnia promptów.", "C": "Wartości nie są losowe — muszą pasować do input_variables.", "D": "LangGraph to osobna warstwa grafów. Sam PromptTemplate bierze dane ze słownika invoke."}}}, "6": {"correct": "C", "why": "Lost in the middle: modele gorzej wykorzystują informacje ze środka długiego kontekstu.", "lesson": {"correct": "Okno kontekstu to długa półka z notatkami. Model dobrze pamięta początek i koniec półki. Środkowe kartki łatwiej „giną”. Dlatego ważne fakty lepiej kłaść na początku lub końcu, a nie chować głęboko w środku ogromnego promptu. To pułapka context engineeringu.", "example": "Wrzuć 30 stron historii czatu. Kluczowy fakt o adresie klienta jest na stronie 15. Model częściej go przegapi niż gdy ten fakt jest na początku albo tuż przed pytaniem. Dlatego czasem streszczamy historię zamiast pchać wszystko.", "remember": "Długi kontekst: środek ginie — ważne na brzegach.", "wrong": {"A": "Model nie czyta tylko ostatniego znaku. Problem dotyczy środka długiego tekstu.", "B": "RAG może działać z wieloma dokumentami; lost in the middle to osobna sprawa uwagi modelu.", "D": "temperature=0 nie czyści okna kontekstu. Steruje losowością generowania."}}}, "7": {"correct": "B", "why": "Bez `.content` widać metadane obiektu odpowiedzi, nie sam tekst dla użytkownika.", "lesson": {"correct": "Model chat zwraca obiekt odpowiedzi, nie goły string. W środku jest tekst w atrybucie .content. Jeśli wydrukujesz cały obiekt, zobaczysz też metadane i „opakowanie”. Do użytkownika zwykle chcesz sam .content — czysty tekst odpowiedzi.", "example": "Po chain.invoke(...) robisz print(response) i widzisz coś jak AIMessage(...). Robisz print(response.content) i dostajesz: „1. Podsumowanie... 2. Fakty...”. Drugie jest tym, czego zwykle oczekujesz w aplikacji.", "remember": "Odpowiedź chat = obiekt; tekst = `.content`.", "wrong": {"A": "Sam print obiektu nie włącza tool calling.", "C": "PromptTemplate nadal jest Runnable niezależnie od tego, jak drukujesz odpowiedź.", "D": "Port Ollamy (domyślnie 11434) nie zależy od printowania odpowiedzi."}}}, "8": {"correct": "A", "why": "FAISS to biblioteka szybkiego wyszukiwania podobieństwa (lokalnie).", "lesson": {"correct": "FAISS pomaga znaleźć podobne wektory. W RAG dokumenty zamieniasz na embeddingi i szukasz tych najbliższych zapytaniu. FAISS robi to lokalnie — w pamięci lub na dysku. To nie LangSmith (tracing) i nie menedżer pakietów.", "example": "Masz 1000 fragmentów dokumentacji. Pytanie: „Jak ustawić temperature?”. FAISS wskazuje kilka najbardziej podobnych chunków. Te chunki trafiają do promptu. Model odpowiada na podstawie nich.", "remember": "FAISS = szybkie lokalne „znajdź podobne”.", "wrong": {"B": "Tracing i obserwowalność to LangSmith, nie FAISS.", "C": "MCP to protokół narzędzi/kontekstu, nie FAISS.", "D": "Menedżer pakietów w projekcie to m.in. uv, nie FAISS."}}}, "9": {"correct": "D", "why": "Wysoka `temperature` utrudnia stabilny, powtarzalny format odpowiedzi.", "lesson": {"correct": "Gdy chcesz zawsze ten sam układ (np. summary + dwa fakty), wysoka temperature psuje przewidywalność. Model bardziej „błądzi” stylistycznie. Niska temperature pomaga utrzymać spokojny, powtarzalny format. To nie gwarancja JSON i nie wyłącza szablonu.", "example": "Przy temperature=0 dostajesz zwykle: „Summary: ... Facts: 1) ... 2) ...”. Przy wysokiej temperature raz masz listę, raz opowiadanie, raz trzy fakty zamiast dwóch. Format się rozjeżdża.", "remember": "Stały format → niska temperature.", "wrong": {"A": "Wysoka temperature wręcz zmniejsza szansę na identyczny wynik.", "B": "PromptTemplate nadal jest potrzebny niezależnie od temperature.", "C": "Temperature nie wymusza Ollamy — działa przy wielu backendach."}}}, "10": {"correct": "B", "why": "Buffer = pełna historia; Summary = historia kompresowana do podsumowania.", "lesson": {"correct": "Pamięć to decyzja context engineeringowa: co agent „pamięta” między turami. Buffer trzyma pełną rozmowę — proste, ale rośnie bez limitu. Summary kompresuje starą historię do krótkiego streszczenia — oszczędza tokeny. To nie zależy od Pinecone vs FAISS.", "example": "Po 50 wiadomościach Buffer pcha wszystkie 50 do kontekstu. Summary zostawia np. „Użytkownik lubi Python, buduje agenta LangChain” + ostatnie kilka tur. Okno kontekstu nie pęka tak szybko.", "remember": "Buffer = wszystko; Summary = skrót historii.", "wrong": {"A": "Żadna z tych pamięci nie kasuje historii po pierwszej turze z założenia.", "C": "Typ pamięci nie jest związany z wyborem FAISS vs Pinecone.", "D": "LangGraph nie jest warunkiem Buffer ani zakazem Summary."}}}, "11": {"correct": "C", "why": "`ChatOpenAI` pochodzi z pakietu `langchain-openai`.", "lesson": {"correct": "W ekosystemie LangChain różne dostawcy mają osobne pakiety integracji. ChatOpenAI jest w langchain-openai i mówi z API OpenAI w chmurze. ChatOllama jest w langchain-ollama i mówi z lokalnym serwerem. python-dotenv tylko ładuje zmienne środowiskowe. Black/isort formatują kod.", "example": "Importujesz: from langchain_openai import ChatOpenAI. Tworzysz llm = ChatOpenAI(model=..., temperature=0). Ten sam łańcuch prompt | llm mógłby dostać ChatOllama z innego pakietu — zmienia się backend, nie idea LCEL.", "remember": "ChatOpenAI = pakiet langchain-openai.", "wrong": {"A": "langchain-ollama to lokalna Ollama, nie ChatOpenAI.", "B": "python-dotenv ładuje .env, nie dostarcza klasy ChatOpenAI.", "D": "black/isort to formatowanie i sortowanie importów, nie klient OpenAI."}}}, "12": {"correct": "A", "why": "Natywne tool calling daje mniej halucynacji formatu i większą niezawodność.", "lesson": {"correct": "Klasyczny ReAct każe modelowi pisać tekst w formacie Thought/Action/Observation. Model czasem psuje ten format. Natywne tool calling każe zwrócić strukturalne wywołanie (np. JSON z nazwą i argumentami). Runtime mapuje to na funkcję Pythona. Mniej zgadywania formatu = większa niezawodność. Rozumowanie agenta nadal istnieje — zmienia się forma akcji.", "example": "Tekstowy ReAct: model pisze „Action: get_weather city Warsaw” i raz pomyli składnię. Natywne tool calling: model zwraca czyste tool_call z argumentami. Program wywołuje funkcję bez zgadywania, co autor miał na myśli w zdaniu.", "remember": "Natywne tool calling = mniej zepsutego formatu akcji.", "wrong": {"B": "Tool calling nie usuwa rozumowania — nadal jest pętla decyzji agenta.", "C": "Nie zastępuje baz wektorowych. RAG i tool calling mogą współistnieć.", "D": "Limity tokenów kontekstu nadal obowiązują."}}}, "13": {"correct": "D", "why": "Minimalny przepływ: dotenv → szablon → LLM → `prompt | llm` → `invoke` → `.content`.", "lesson": {"correct": "Najpierw ładujesz środowisko, żeby był klucz API. Potem definiujesz PromptTemplate. Tworzysz model chat. Składasz łańcuch operatorem |. Wywołujesz invoke ze słownikiem. Na końcu bierzesz response.content. To baza pod narzędzia, pamięć i RAG.", "example": "Krok po kroku: load_dotenv(); prompt = PromptTemplate(...); llm = ChatOpenAI(...); chain = prompt | llm; response = chain.invoke({\"information\": \"...\"}); print(response.content). Bez dotenv często brakuje klucza. Bez .content widzisz opakowanie odpowiedzi.", "remember": "dotenv → szablon → model → pipe → invoke → content.", "wrong": {"A": "Nie wołasz invoke przed załadowaniem środowiska i bez szablonu w sensownym pipeline.", "B": "To nie trening ML od zera — to aplikacja LLM.", "C": "LangSmith i usuwanie .env nie są kolejnością minimalnego pipeline."}}}, "14": {"correct": "B", "why": "Rozmiar chunków i strategia podziału często wpływają na jakość bardziej niż wybór modelu.", "lesson": {"correct": "W RAG dokumenty kroisz na kawałki (chunki), robisz embeddingi i szukasz podobnych. Jeśli chunki są złe (za duże, za małe, bez overlapu), retriever poda modelowi śmieci albo urwane myśli. Nawet mocny model nie naprawi złego kontekstu. Dlatego chunking to kluczowa decyzja projektowa.", "example": "Chunk 50 znaków urywa zdanie w połowie — model dostaje bełkot. Chunk 10 stron miesza wiele tematów — wyszukiwanie trafia „obok”. Lepsze chunki + overlap często dają większy skok jakości niż sama zmiana modelu.", "remember": "Zły chunk = zły kontekst = słaba odpowiedź.", "wrong": {"A": "Kolor wykresów w LangSmith nie jest celem chunkingu.", "C": "Chunking ma sens właśnie razem z embeddingami i indeksem.", "D": "Chunking ma realny wpływ — to nie dekoracja."}}}, "15": {"correct": "C", "why": "Niezgodność kluczy z `input_variables` zwykle kończy się błędem walidacji wejścia.", "lesson": {"correct": "Szablon deklaruje, jakich nazw oczekuje. Jeśli w invoke podasz inne klucze, kontrakt wejścia jest złamany. Zwykle dostajesz błąd walidacji, a nie ciche „jakoś działa”. To chroni przed półwypełnionymi promptami z dziurami {information}.", "example": "input_variables = [\"information\"], a Ty robisz invoke({\"info\": \"tekst\"}). Klucz się nie zgadza. Framework zgłasza błąd zamiast wysłać do modelu prompt z pustym placeholderem. Poprawka: użyj dokładnie „information”.", "remember": "Klucze invoke = dokładnie input_variables.", "wrong": {"A": "Nie ma cichego pomijania — walidacja ma złapać niezgodność.", "B": "Ollama nie nadpisuje magicznie kluczy słownika.", "D": "Operator `|` składa Runnable, nie naprawia złych kluczy nowym szablonem."}}}, "16": {"correct": "A", "why": "`uv sync` tworzy środowisko i instaluje zależności z lockfile.", "lesson": {"correct": "uv to menedżer pakietów i środowisk. uv sync czyta lockfile z dokładnymi wersjami, tworzy .venv i instaluje zależności. Dzięki temu wszyscy mają podobne środowisko. Nie commituje .env i nie usuwa pyproject.toml.", "example": "Klonujesz repo. Odpalasz uv sync. Powstaje .venv z langchain, langchain-openai, python-dotenv itd. Potem uruchamiasz skrypt przez uv run python ... albo aktywujesz środowisko.", "remember": "uv sync = zsynchronizuj .venv z lockfile.", "wrong": {"B": "Commitowanie .env to błąd bezpieczeństwa; uv sync tego nie robi.", "C": "uv sync instaluje pakiety Pythona, nie „uruchamia GPT zamiast Pythona”.", "D": "pyproject.toml zostaje — to źródło metadanych projektu."}}}, "17": {"correct": "B", "why": "Deep Agents: wielopoziomowe planowanie i delegowanie podzadań.", "lesson": {"correct": "Deep Agents to głębsze architektury agentowe. Planują na wysokim poziomie, dzielą pracę na podzadania i mogą delegować je wyspecjalizowanym agentom. Potem korygują plan na podstawie wyników. LangGraph dobrze się do tego nadaje dzięki grafom i warunkowym przejściom. To nie pojedyncze „zapytaj model raz”.", "example": "Cel: raport o rynku. Agent-planista dzieli: research, analiza, pisanie. Agent research szuka źródeł. Agent piszący składa raport. Planista sprawdza braki i dopina poprawki. To wielopoziomowa współpraca, nie jedno wywołanie LLM.", "remember": "Deep Agents = planuj, deleguj, poprawiaj.", "wrong": {"A": "Pojedyncze wywołanie LLM to klasyczny pipeline, nie deep agent.", "C": "Chroma to baza wektorowa; deep agents to architektura agentowa.", "D": "Black formatuje kod — nie definiuje deep agents."}}}, "18": {"correct": "D", "why": "`temperature=0` dąży do bardziej deterministycznych, powtarzalnych wyników.", "lesson": {"correct": "Przy streszczeniach i faktach chcesz spokojnych, powtarzalnych odpowiedzi. temperature=0 zmniejsza losowość. Model mniej „wymyśla styl”. Nadal generuje tekst — nie wyłącza generowania. Nie wymusza FAISS i nie zamienia invoke na fit.", "example": "Robisz summary osoby z tej samej biografii dwa razy przy temperature=0. Dostajesz bardzo podobne summary i podobne fakty. Przy wysokiej temperature drugi przebieg może zmienić kolejność i dobór faktów.", "remember": "Streszczenia i fakty → temperature blisko zera.", "wrong": {"A": "Model nadal generuje tekst; temperature nie wyłącza generowania.", "B": "FAISS nie jest wymagany przez temperature=0.", "C": "invoke zostaje; fit to nie ten wzorzec LangChain chat."}}}, "19": {"correct": "C", "why": "Pruning tool results: obcinanie zbyt długich wyników narzędzi przed kontekstem.", "lesson": {"correct": "Wynik narzędzia może być ogromny (np. długa odpowiedź API). Jeśli wrzucisz wszystko do kontekstu, zajmiesz tokeny i zepsujesz uwagę modelu. Pruning oznacza: przytnij wynik (np. pierwsze N znaków) zanim dołączysz go do promptu. To świadome zarządzanie oknem kontekstu.", "example": "Narzędzie zwraca 20 000 znaków HTML. Zostawiasz pierwsze 500 znaków albo wyciągasz jedno kluczowe pole JSON. Model dostaje esencję, a nie powieść. Instrukcja systemowa i pytanie użytkownika mają dalej miejsce.", "remember": "Długi wynik narzędzia → przytnij przed kontekstem.", "wrong": {"A": "Dokładnie odwrotnie: pruning ogranicza długość, nie dokłada bez limitu.", "B": "To nie trening modelu — to zarządzanie kontekstem w runtime.", "D": "Nie usuwasz instrukcji systemowej; chronisz miejsce w oknie kontekstu."}}}, "20": {"correct": "A", "why": "`PromptTemplate` jest Runnable — da się go złożyć w łańcuch i wielokrotnie wywoływać.", "lesson": {"correct": "Zwykły f-string skleja tekst raz. PromptTemplate jest komponentem Runnable. Możesz go podłączyć do modelu operatorem | i wołać wiele razy z różnymi danymi. To podstawa LCEL: jasny kontrakt wejścia i kompozycja kroków. Nie buduje FAISS i nie jest wymagany dlatego, że f-stringi są „zabronione”.", "example": "Ten sam szablon z product=cat food, potem product=piano. Za każdym razem inny wynik, bo inne wejście. Łańcuch prompt | llm zostaje ten sam — zmieniasz tylko słownik w invoke. Przy gołym f-stringu trudniej to złożyć jako powtarzalny komponent.", "remember": "PromptTemplate = Runnable do wielokrotnego użycia w łańcuchu.", "wrong": {"B": "f-stringi są legalne w Pythonie; problemem jest brak kompozycji Runnable.", "C": "PromptTemplate nie buduje indeksu FAISS.", "D": "ChatOpenAI i tak przyjmuje model=...; szablon nie jest warunkiem tego parametru."}}}}};
+
+const form = document.getElementById('quiz-form');
+const answeredCount = document.getElementById('answered-count');
+const statusLabel = document.getElementById('status-label');
+const resultsEl = document.getElementById('results');
+let graded = false;
+let lastGrade = null;
+
+function esc(s) {
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+function renderForm() {
+  form.innerHTML = QUIZ.questions.map(q => {
+    const opts = ['A','B','C','D'].map(L => `
+      <label class="opt">
+        <input type="radio" name="q${q.n}" value="${L}" />
+        <span class="letter">${L})</span>
+        <span>${esc(q.options[L] || '')}</span>
+      </label>`).join('');
+    const idk = `
+      <label class="opt opt-idk">
+        <input type="radio" name="q${q.n}" value="?" />
+        <span class="letter">?</span>
+        <span><strong>Nie mam pojęcia</strong> — bez zgadywania, chcę się nauczyć</span>
+      </label>`;
+    return `
+      <article class="card" id="card-${q.n}" data-n="${q.n}">
+        <div class="meta">
+          <span class="tag">#${q.n}</span>
+          <span class="tag diff-${esc(q.difficulty)}">${esc(q.difficulty)}</span>
+          <span class="tag">${esc(q.category)}</span>
+        </div>
+        <h2 class="q-title"><span class="num">${q.n}.</span></h2>
+        <p class="prompt">${esc(q.prompt)}</p>
+        <div class="options">${opts}${idk}</div>
+        <div class="confidence">
+          <span>Pewność:</span>
+          <select name="c${q.n}" aria-label="Pewność pytania ${q.n}">
+            <option value="">—</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="feedback" id="why-${q.n}" hidden></div>
+      </article>`;
+  }).join('');
+}
+
+function collect() {
+  return QUIZ.questions.map(q => {
+    const picked = form.querySelector(`input[name="q${q.n}"]:checked`);
+    const conf = form.querySelector(`select[name="c${q.n}"]`);
+    return {
+      n: q.n,
+      answer: picked ? picked.value : '',
+      confidence: conf && conf.value ? conf.value : '—',
+    };
+  });
+}
+
+function updateProgress() {
+  const n = collect().filter(x => x.answer).length;
+  answeredCount.textContent = String(n);
+}
+
+function lessonHtml(key, mode, picked) {
+  const L = key.lesson;
+  const parts = [];
+  if (mode === 'bad') {
+    parts.push(`<h3>BŁĄD · Twoja: ${esc(picked)} · Poprawna: ${esc(key.correct)}</h3>`);
+    const wrongTxt = (L.wrong && L.wrong[picked]) ? L.wrong[picked] : '';
+    parts.push(`<h4>Twoja odpowiedź</h4><p>${esc(wrongTxt)}</p>`);
+  } else if (mode === 'idk') {
+    parts.push(`<h3>NIE WIEM · Poprawna: ${esc(key.correct)}</h3>`);
+    parts.push(`<p>Bez zgadywania — oto wyjaśnienie.</p>`);
+  }
+  parts.push(`<h4>Poprawna myśl</h4><p>${esc(L.correct)}</p>`);
+  parts.push(`<h4>Przykład</h4><p>${esc(L.example)}</p>`);
+  parts.push(`<h4>Zapamiętaj</h4><p class="remember">${esc(L.remember)}</p>`);
+  return parts.join('');
+}
+
+function grade() {
+  const rows = collect();
+  const missing = rows.filter(r => !r.answer).map(r => r.n);
+  if (missing.length) {
+    alert('Brak odpowiedzi w pytaniach: ' + missing.join(', '));
+    return null;
+  }
+  let ok = 0;
+  let idk = 0;
+  const detail = rows.map(r => {
+    const key = QUIZ.answers[String(r.n)];
+    const correct = key.correct;
+    const isIdk = r.answer === '?';
+    const isOk = !isIdk && r.answer === correct;
+    if (isOk) ok += 1;
+    if (isIdk) idk += 1;
+    const card = document.getElementById('card-' + r.n);
+    const why = document.getElementById('why-' + r.n);
+    card.classList.remove('ok', 'bad', 'learn');
+    why.hidden = false;
+    why.classList.remove('ok-box', 'bad-box', 'learn-box');
+    let wynik = 'BŁĄD';
+    if (isOk) {
+      wynik = 'OK';
+      card.classList.add('ok');
+      why.classList.add('ok-box');
+      why.innerHTML = `<h3>OK</h3><p>${esc(key.why)}</p>`;
+    } else if (isIdk) {
+      wynik = 'NIE WIEM';
+      card.classList.add('learn');
+      why.classList.add('learn-box');
+      why.innerHTML = lessonHtml(key, 'idk', r.answer);
+    } else {
+      card.classList.add('bad');
+      why.classList.add('bad-box');
+      why.innerHTML = lessonHtml(key, 'bad', r.answer);
+    }
+    return { ...r, correct, isOk, isIdk, wynik, why: key.why };
+  });
+  const pct = Math.round((ok / 20) * 100);
+  document.getElementById('score-text').textContent = `${ok}/20`;
+  document.getElementById('pct-text').textContent = `Skuteczność: ${pct}%`;
+  document.getElementById('idk-text').textContent = `Nie wiem: ${idk}`;
+  resultsEl.classList.add('show');
+  statusLabel.textContent = 'Sprawdzono';
+  graded = true;
+  lastGrade = { ok, pct, idk, detail };
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return lastGrade;
+}
+
+function download(filename, content) {
+  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function buildMyAnswers(detail) {
+  const lines = [
+    `# Moje odpowiedzi – ${QUIZ.date}`,
+    '',
+    '| # | Twoja odpowiedź (A/B/C/D/?) | Pewność (1-5) | Uwagi |',
+    '|---|---------------------------|---------------|-------|',
+  ];
+  for (const r of detail) {
+    lines.push(`| ${r.n} | ${r.answer} | ${r.confidence === '—' ? '' : r.confidence} | |`);
+  }
+  lines.push('', '## Notatki', '');
+  return lines.join('\\n');
+}
+
+function buildResults(grade) {
+  const lines = [
+    `# Wynik quizu — ${QUIZ.date}`,
+    '',
+    '## Wynik',
+    '',
+    `- Poprawne odpowiedzi: ${grade.ok}/20`,
+    `- Skuteczność: ${grade.pct}%`,
+    `- Nie wiem: ${grade.idk}`,
+    '',
+    '## Szczegóły',
+    '',
+    '| # | Twoja odpowiedź | Poprawna odpowiedź | Wynik | Pewność | Komentarz |',
+    '|---|---|---|---|---|---|',
+  ];
+  for (const r of grade.detail) {
+    const pew = r.confidence === '—' ? '—' : r.confidence;
+    lines.push(`| ${r.n} | ${r.answer} | ${r.correct} | ${r.wynik} | ${pew} | ${r.why} |`);
+  }
+  const toReview = grade.detail.filter(r => !r.isOk);
+  const strong = grade.detail.filter(r => r.isOk);
+  lines.push('', '## Mocne strony', '');
+  if (strong.length) {
+    lines.push(`- Poprawnie: ${strong.map(r => r.n).join(', ')}`);
+  } else {
+    lines.push('- Brak poprawnych w tej próbie — spokojnie, mini-lekcje na stronie pomogą.');
+  }
+  lines.push('', '## Obszary do powtórki', '');
+  if (!toReview.length) {
+    lines.push('- Brak — pełny wynik.');
+  } else {
+    for (const r of toReview) {
+      lines.push(`- Pyt. ${r.n} (${r.wynik}): ${r.why}`);
+    }
+  }
+  lines.push('');
+  return lines.join('\\n');
+}
+
+form.addEventListener('change', updateProgress);
+document.getElementById('submit-btn').addEventListener('click', () => grade());
+document.getElementById('reset-btn').addEventListener('click', () => {
+  form.reset();
+  graded = false;
+  lastGrade = null;
+  resultsEl.classList.remove('show');
+  statusLabel.textContent = 'W trakcie';
+  QUIZ.questions.forEach(q => {
+    const card = document.getElementById('card-' + q.n);
+    const why = document.getElementById('why-' + q.n);
+    card.classList.remove('ok', 'bad', 'learn');
+    why.hidden = true;
+    why.innerHTML = '';
+    why.classList.remove('ok-box', 'bad-box', 'learn-box');
+  });
+  updateProgress();
+});
+document.getElementById('dl-answers').addEventListener('click', () => {
+  const g = lastGrade || grade();
+  if (!g) return;
+  download(`${QUIZ.date}_my_answers.md`, buildMyAnswers(g.detail));
+});
+document.getElementById('dl-results').addEventListener('click', () => {
+  const g = lastGrade || grade();
+  if (!g) return;
+  download(`${QUIZ.date}_results.md`, buildResults(g));
+});
+
+renderForm();
+updateProgress();
+</script>
+</body>
+</html>
