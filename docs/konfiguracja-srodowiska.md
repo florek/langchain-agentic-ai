@@ -32,6 +32,7 @@ Główne pakiety zainstalowane w projekcie:
 | `langchain` | Rdzeń frameworka LangChain (łańcuchy, agenci, abstrakcje LLM) |
 | `langchain-openai` | Integracja z modelami OpenAI (GPT-4, GPT-4o itd.) |
 | `langchain-ollama` | Integracja z lokalnymi modelami przez serwer Ollama |
+| `langsmith` | SDK tracingu/ewaluacji (zależność LangChain; wymaga `.env`) |
 | `python-dotenv` | Ładowanie zmiennych środowiskowych z pliku `.env` |
 | `black` | Automatyczne formatowanie kodu |
 | `isort` | Sortowanie importów |
@@ -69,16 +70,34 @@ Wywołanie `load_dotenv()` szuka pliku `.env` w bieżącym katalogu roboczym i u
 
 ## Zmienne środowiskowe API
 
-Klucze do zewnętrznych usług LLM (np. OpenAI) przechowuje się w zmiennych środowiskowych, nie w kodzie źródłowym. Typowa nazwa to `OPEN_AI_KEY` lub `OPENAI_API_KEY` — w projekcie używana jest forma zgodna z konfiguracją lokalnego pliku `.env`.
+Klucze do zewnętrznych usług LLM i narzędzi ekosystemu przechowuje się w zmiennych środowiskowych, nie w kodzie źródłowym. Szablon pustych nazw jest w `.env.example`; lokalne wartości są w `.env` (ignorowanym przez Git).
+
+| Zmienna | Rola |
+|---------|------|
+| `OPENAI_API_KEY` | Klucz OpenAI (oczekiwany przez `langchain-openai`) |
+| `LANGSMITH_TRACING` | `true` włącza automatyczny tracing LangChain → LangSmith |
+| `LANGSMITH_API_KEY` | Klucz API LangSmith |
+| `LANGSMITH_ENDPOINT` | URL API LangSmith (US: `https://api.smith.langchain.com`) |
+| `LANGSMITH_PROJECT` | Nazwa projektu tracingu w LangSmith |
 
 Odczyt w kodzie:
 
 ```python
 import os
-api_key = os.getenv("OPEN_AI_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 ```
 
 Jeśli zmienna nie istnieje, `getenv` zwraca `None` — aplikacja powinna obsłużyć ten przypadek (komunikat błędu lub fallback), zanim spróbuje wywołać API.
+
+### LangSmith tracing
+
+Gdy `LANGSMITH_TRACING=true` i ustawiony jest `LANGSMITH_API_KEY`, każde wywołanie łańcucha LangChain (np. `chain.invoke(...)`) jest automatycznie wysyłane do LangSmith. Nie trzeba dodawać dekoratorów ani ręcznych callbacków — wystarczy `load_dotenv()` przed utworzeniem klienta LLM.
+
+Sprawdzenie połączenia:
+
+```bash
+uv run python -c "from dotenv import load_dotenv; load_dotenv(); from langsmith import Client; print(Client().list_projects(limit=1))"
+```
 
 ## Ollama jako lokalna alternatywa
 
@@ -89,4 +108,6 @@ Jeśli zmienna nie istnieje, `getenv` zwraca `None` — aplikacja powinna obsłu
 - Uruchamianie skryptu spoza katalogu projektu — `load_dotenv()` może nie znaleźć `.env`.
 - Brak aktywnego środowiska wirtualnego — import `langchain` kończy się błędem `ModuleNotFoundError`.
 - Commitowanie `.env` do Gita — wyciek klucza API; plik musi pozostać w `.gitignore`.
-- Mylenie nazw zmiennych (`OPEN_AI_KEY` vs `OPENAI_API_KEY`) — integracja LangChain OpenAI oczekuje standardowej nazwy z dokumentacji pakietu.
+- Mylenie nazw zmiennych (`OPEN_AI_KEY` vs `OPENAI_API_KEY`) — integracja LangChain OpenAI oczekuje `OPENAI_API_KEY`.
+- Brak `LANGSMITH_TRACING=true` przy ustawionym `LANGSMITH_API_KEY` — klucz jest obecny, ale trace’y nie są wysyłane.
+- Stare nazwy `LANGCHAIN_TRACING_V2` / `LANGCHAIN_API_KEY` nadal działają jako aliasy; w projekcie używamy `LANGSMITH_*`.

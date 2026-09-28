@@ -104,7 +104,14 @@ LangSmith to platforma do:
 - **Evaluation** — automatyczne testy jakości odpowiedzi na zestawie przykładów,
 - **Monitoring** — obserwacja aplikacji produkcyjnej.
 
-Integracja wymaga ustawienia zmiennych `LANGCHAIN_TRACING_V2=true` i `LANGCHAIN_API_KEY`.
+Integracja wymaga zmiennych w `.env`:
+
+- `LANGSMITH_TRACING=true` — włącza automatyczny tracing wywołań LangChain,
+- `LANGSMITH_API_KEY` — klucz API z konta LangSmith,
+- `LANGSMITH_ENDPOINT` — endpoint API (domyślnie `https://api.smith.langchain.com`),
+- `LANGSMITH_PROJECT` — nazwa projektu w LangSmith (opcjonalna; bez niej powstaje projekt `default`).
+
+Po `load_dotenv()` i uruchomieniu łańcucha (`chain.invoke(...)`) trace pojawia się automatycznie w LangSmith — bez dodatkowych dekoratorów.
 
 ## Model Context Protocol (MCP)
 
