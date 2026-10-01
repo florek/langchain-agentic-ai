@@ -17,7 +17,7 @@ Agentic AI to podejście do budowania aplikacji opartych o modele językowe (LLM
 - **LangChain** — framework do budowania aplikacji LLM: łańcuchy, agenci, integracje z modelami i narzędziami.
 - **LangGraph** — biblioteka do definiowania przepływów agentowych jako grafów stanów z warunkowymi przejściami.
 - **Tool Calling** — mechanizm, w którym LLM zwraca strukturalne żądanie wywołania funkcji zamiast samego tekstu.
-- **ReAct** (Reasoning + Acting) — wzorzec promptowania, w którym agent na przemian rozumuje (Thought) i działa (Action/Observation).
+- **ReAct** (Reasoning + Acting) — architektura agentowa (oraz odpowiadający jej wzorzec promptowania), w której agent działa w pętli: rozumowanie → działanie (tool) → obserwacja wyniku, aż do odpowiedzi końcowej.
 - **Prompt Engineering** — projektowanie instrukcji systemowych i szablonów promptów dla lepszych odpowiedzi.
 - **Context Engineering** — świadome zarządzanie tym, co trafia do okna kontekstowego modelu (historia, dokumenty, wyniki narzędzi).
 - **LangSmith** — platforma do śledzenia, debugowania i ewaluacji aplikacji LangChain.
