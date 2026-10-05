@@ -44,6 +44,8 @@ Agent to pętla, w której model:
 
 Agent kończy pracę, gdy model zwróci odpowiedź końcową lub osiągnięty zostanie limit iteracji.
 
+W LangChain 1.0 pojawia się wysokopoziomowy interfejs tworzenia agentów (`create_agent`). Upraszcza uruchomienie nowoczesnego agenta z toolami, a pod spodem korzysta z dojrzałej implementacji opartej o LangGraph. Implementacje agentów ewoluowały: od tekstowego ReAct (Action/Observation w prompcie), przez strukturalne tool calling, po grafy stanów i prostsze API.
+
 ## LangGraph — grafy stanów
 
 LangGraph rozszerza LangChain o modelowanie przepływów jako **grafów stanów** (state machines):
